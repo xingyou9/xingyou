@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>山东春考志愿分数查询（动态版）</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{font-family:"微软雅黑",Arial;background:#f0f4f8;margin:0;padding:18px}
+.title{text-align:center;font-size:26px;font-weight:bold;margin-bottom:25px;animation:titleFade 0.8s ease-in-out;}
+
+/* 升级动态液态玻璃效果标题栏 */
+.class-title{
+  background: linear-gradient(135deg, rgba(255,255,255,0.35), rgba(255,255,255,0.15));
+  backdrop-filter: blur(12px) saturate(200%);
+  -webkit-backdrop-filter: blur(12px) saturate(200%);
+  border: 1px solid rgba(255,255,255,0.4);
+  border-radius: 12px;
+  padding: 12px 16px;
+  font-weight: bold;
+  font-size: 18px;
+  margin: 24px 0 12px;
+  color: #1a1a1a;
+  box-shadow: 0 8px 32px rgba(31, 38, 135, 0.1);
+  position: relative;
+  overflow: hidden;
+  animation:titleSlide 0.6s ease-out forwards;
+  opacity:0;
+}
+/* 液态玻璃专属流光动画效果 */
+.class-title::before{
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.45), transparent);
+  animation: liquidFlow 6s infinite linear;
+}
+@keyframes liquidFlow{
+  0%{left: -100%;}
+  100%{left: 100%;}
+}
+@keyframes titleFade{
+  from{opacity:0;transform:translateY(-20px);}
+  to{opacity:1;transform:translateY(0);}
+}
+@keyframes titleSlide{
+  from{opacity:0;transform:translateX(-30px);}
+  to{opacity:1;transform:translateX(0);}
+}
+@keyframes cardFadeIn{
+  from{opacity:0;transform:translateY(20px);}
+  to{opacity:1;transform:translateY(0);}
+}
+
+.search-wrap{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:20px;animation:titleFade 0.8s ease-in-out 0.2s both;}
+#scoreInput,#areaSelect{
+  padding:10px 14px;
+  border:1px solid #ccc;
+  border-radius:6px;
+  font-size:15px;
+  transition:all 0.3s ease;
+}
+#scoreInput:focus,#areaSelect:focus{
+  outline:none;
+  border-color:#1677ff;
+  box-shadow:0 0 0 3px rgba(22,119,255,0.1);
+  transform:scale(1.02);
+}
+#scoreInput{width:220px}
+#areaSelect{width:210px}
+
+.school-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:10px}
+.school-card{
+  background:#fff;
+  padding:12px;
+  border-radius:6px;
+  box-shadow:0 1px 4px rgba(0,0,0,0.1);
+  cursor:pointer;
+  transition:all 0.3s ease;
+  animation:cardFadeIn 0.5s ease-out forwards;
+  opacity:0;
+}
+/* 卡片滚动渐入动画延迟 */
+.school-card:nth-child(1n){animation-delay:calc(0.05s * var(--i));}
+.school-card:hover{
+  transform:translateY(-5px) scale(1.03);
+  box-shadow:0 8px 20px rgba(0,0,0,0.12);
+}
+.school-card.hide{
+  opacity:0;
+  transform:scale(0.95);
+  pointer-events:none;
+  display:none;
+}
+.school-card.show{
+  opacity:1;
+  transform:scale(1);
+  pointer-events:auto;
+  display:block;
+}
+.school-name{font-weight:bold;margin-bottom:5px}
+.score-range{color:#c92a2a}
+.city-tag{font-size:12px;color:#555;margin-top:4px}
+</style>
+</head>
+<body>
+<div class="title">山东春考志愿分数查询（动态版）</div>
+
+<div class="search-wrap">
+<input id="scoreInput" placeholder="输入分数一键匹配可报院校" oninput="filterSchool()">
+<select id="areaSelect" onchange="filterSchool()">
+<option value="">全部地市</option>
+<option value="济南">济南</option>
+<option value="青岛">青岛</option>
+<option value="德州">德州</option>
+<option value="潍坊">潍坊</option>
+<option value="烟台">烟台</option>
+<option value="临沂">临沂</option>
+<option value="淄博">淄博</option>
+<option value="济宁">济宁</option>
+<option value="菏泽">菏泽</option>
+<option value="泰安">泰安</option>
+<option value="威海">威海</option>
+<option value="日照">日照</option>
+<option value="滨州">滨州</option>
+<option value="东营">东营</option>
+<option value="聊城">聊城</option>
+<option value="枣庄">枣庄</option>
+</select>
+</div>
+
+<!-- 公办本科（有专科）原有内容100%保留，新增官网跳转 -->
+<div class="class-title">公办本科（有专科）</div>
+<div class="school-grid">
+<div class="school-card" style="--i:1" data-city="济南" data-min="480" data-max="500" data-url="https://www.sdupsl.edu.cn/"><div class="school-name">山东政法学院</div><div class="score-range">480-500</div><div class="city-tag">济南·历下区解放东路63号</div></div>
+<div class="school-card" style="--i:2" data-city="济南" data-min="470" data-max="490" data-url="https://www.sdyu.edu.cn/"><div class="school-name">山东青年政治学院</div><div class="score-range">470-490</div><div class="city-tag">济南·历城区经十东路31699号</div></div>
+<div class="school-card" style="--i:3" data-city="潍坊" data-min="440" data-max="480" data-url="https://www.wfu.edu.cn/"><div class="school-name">潍坊学院</div><div class="score-range">440-480</div><div class="city-tag">潍坊·奎文区东风东街5147号</div></div>
+<div class="school-card" style="--i:4" data-city="济南" data-min="440" data-max="480" data-url="https://www.sdmu.edu.cn/"><div class="school-name">山东管理学院</div><div class="score-range">440-480</div><div class="city-tag">济南·长清区丁香路3500号</div></div>
+<div class="school-card" style="--i:5" data-city="济南" data-min="450" data-max="470" data-url="https://www.sdwu.edu.cn/"><div class="school-name">山东女子学院</div><div class="score-range">450-470</div><div class="city-tag">济南·长清区大学路2399号</div></div>
+<div class="school-card" style="--i:6" data-city="临沂" data-min="430" data-max="480" data-url="https://www.lyu.edu.cn/"><div class="school-name">临沂大学</div><div class="score-range">430-480</div><div class="city-tag">临沂·兰山区工业大道北段西侧</div></div>
+<div class="school-card" style="--i:7" data-city="德州" data-min="420" data-max="470" data-url="https://www.dzu.edu.cn/"><div class="school-name">德州学院</div><div class="score-range">420-470</div><div class="city-tag">德州·德城区大学西路566号</div></div>
+<div class="school-card" style="--i:8" data-city="泰安" data-min="430" data-max="470" data-url="https://www.tsu.edu.cn/"><div class="school-name">泰山学院</div><div class="score-range">430-470</div><div class="city-tag">泰安·岱岳区东岳大街525号</div></div>
+<div class="school-card" style="--i:9" data-city="滨州" data-min="380" data-max="450" data-url="https://www.bzu.edu.cn/"><div class="school-name">山东航空学院</div><div class="score-range">380-450</div><div class="city-tag">滨州·滨城区黄河五路391号</div></div>
+<div class="school-card" style="--i:10" data-city="济宁" data-min="440" data-max="460" data-url="https://www.jnxy.edu.cn/"><div class="school-name">济宁学院</div><div class="score-range">440-460</div><div class="city-tag">济宁·曲阜市杏坛路1号</div></div>
+<div class="school-card" style="--i:11" data-city="济南" data-min="450" data-max="480" data-url="https://www.qlnu.edu.cn/"><div class="school-name">齐鲁师范学院</div><div class="score-range">450-480</div><div class="city-tag">济南·章丘区文博路2号</div></div>
+<div class="school-card" style="--i:12" data-city="济南" data-min="440" data-max="470" data-url="https://www.sdaeu.edu.cn/"><div class="school-name">山东农业工程学院</div><div class="score-range">440-470</div><div class="city-tag">济南·历城区农干院路866号</div></div>
+<div class="school-card" style="--i:13" data-city="济南" data-min="439" data-max="439" data-url="https://www.sdada.edu.cn/"><div class="school-name">山东工艺美术学院</div><div class="score-range">439</div><div class="city-tag">济南·长清区大学路1255号</div></div>
+<div class="school-card" style="--i:14" data-city="枣庄" data-min="343" data-max="459" data-url="https://www.uzz.edu.cn/"><div class="school-name">枣庄学院</div><div class="score-range">343-459</div><div class="city-tag">枣庄·市中区北安路1号</div></div>
+<div class="school-card" style="--i:15" data-city="菏泽" data-min="413" data-max="463" data-url="https://www.hezeu.edu.cn/"><div class="school-name">菏泽学院</div><div class="score-range">413-463</div><div class="city-tag">菏泽·牡丹区大学路2269号</div></div>
+</div>
+
+<!-- 公办新/老双高 原有内容100%保留，新增官网跳转 -->
+<div class="class-title">公办新/老双高</div>
+<div class="school-grid">
+<div class="school-card" style="--i:1" data-city="济南" data-min="460" data-max="530" data-url="https://www.sdp.edu.cn/"><div class="school-name">山东职业学院</div><div class="score-range">460-530</div><div class="city-tag">济南·章丘区经十东路23000号</div></div>
+<div class="school-card" style="--i:2" data-city="济南" data-min="380" data-max="490" data-url="https://www.sict.edu.cn/"><div class="school-name">山东商业职业技术学院</div><div class="score-range">380-490</div><div class="city-tag">济南·历城区旅游路4516号</div></div>
+<div class="school-card" style="--i:3" data-city="日照" data-min="410" data-max="490" data-url="https://www.rzpt.cn/"><div class="school-name">日照职业技术学院</div><div class="score-range">410-490</div><div class="city-tag">日照·东港区烟台北路16号</div></div>
+<div class="school-card" style="--i:4" data-city="滨州" data-min="340" data-max="450" data-url="https://www.bzpt.edu.cn/"><div class="school-name">滨州职业学院</div><div class="score-range">340-450</div><div class="city-tag">滨州·滨城区黄河十二路919号</div></div>
+<div class="school-card" style="--i:5" data-city="潍坊" data-min="360" data-max="470" data-url="https://www.sdzy.cn/"><div class="school-name">山东科技职业学院</div><div class="score-range">360-470</div><div class="city-tag">潍坊·潍城区西环路6388号</div></div>
+<div class="school-card" style="--i:6" data-city="淄博" data-min="400" data-max="480" data-url="https://www.zbvc.cn/"><div class="school-name">淄博职业学院</div><div class="score-range">400-480</div><div class="city-tag">淄博·周村区联通路506号</div></div>
+<div class="school-card" style="--i:7" data-city="青岛" data-min="360" data-max="470" data-url="https://www.qdgw.edu.cn/"><div class="school-name">青岛港湾职业技术学院</div><div class="score-range">360-470</div><div class="city-tag">青岛·黄岛区映山红路316号</div></div>
+<div class="school-card" style="--i:8" data-city="威海" data-min="350" data-max="470" data-url="https://www.whvc.edu.cn/"><div class="school-name">威海职业学院</div><div class="score-range">350-470</div><div class="city-tag">威海·环翠区科技中路205号</div></div>
+<div class="school-card" style="--i:9" data-city="潍坊" data-min="380" data-max="470" data-url="https://www.sdjtzy.cn/"><div class="school-name">山东交通职业学院</div><div class="score-range">380-470</div><div class="city-tag">潍坊·寒亭区渤海路1001号</div></div>
+<div class="school-card" style="--i:10" data-city="烟台" data-min="340" data-max="460" data-url="https://www.ytvc.edu.cn/"><div class="school-name">烟台职业学院</div><div class="score-range">340-460</div><div class="city-tag">烟台·莱山区滨海中路2018号</div></div>
+<div class="school-card" style="--i:11" data-city="潍坊" data-min="320" data-max="470" data-url="https://www.sdwfvc.cn/"><div class="school-name">潍坊职业学院</div><div class="score-range">320-470</div><div class="city-tag">潍坊·奎文区东风东街243号</div></div>
+<div class="school-card" style="--i:12" data-city="济南" data-min="400" data-max="480" data-url="https://www.jnvc.cn/"><div class="school-name">济南职业学院</div><div class="score-range">400-480</div><div class="city-tag">济南·历下区舜耕路12号</div></div>
+<div class="school-card" style="--i:13" data-city="青岛" data-min="400" data-max="480" data-url="https://www.qtc.edu.cn/"><div class="school-name">青岛职业技术学院</div><div class="score-range">400-480</div><div class="city-tag">青岛·黄岛区钱塘江路369号</div></div>
+<div class="school-card" style="--i:14" data-city="济南" data-min="331" data-max="427" data-url="https://www.lwvc.edu.cn/"><div class="school-name">莱芜职业技术学院</div><div class="score-range">331-427</div><div class="city-tag">济南·莱芜区山财大街1号</div></div>
+<div class="school-card" style="--i:15" data-city="济宁" data-min="321" data-max="417" data-url="https://www.jnzyjsxy.cn/"><div class="school-name">济宁职业技术学院</div><div class="score-range">321-417</div><div class="city-tag">济宁·任城区金宇路3号</div></div>
+<div class="school-card" style="--i:16" data-city="青岛" data-min="349" data-max="456" data-url="https://www.qchm.edu.cn/"><div class="school-name">青岛酒店管理职业技术学院</div><div class="score-range">349-456</div><div class="city-tag">青岛·李沧区九水东路599号</div></div>
+<div class="school-card" style="--i:17" data-city="潍坊" data-min="312" data-max="436" data-url="https://www.wfec.cn/"><div class="school-name">潍坊工程职业学院</div><div class="score-range">312-436</div><div class="city-tag">潍坊·青州市玲珑山南路4139号</div></div>
+<div class="school-card" style="--i:18" data-city="东营" data-min="324" data-max="424" data-url="https://www.dyxy.edu.cn/"><div class="school-name">东营职业学院</div><div class="score-range">324-424</div><div class="city-tag">东营·东营区府前大街129号</div></div>
+<div class="school-card" style="--i:19" data-city="潍坊" data-min="352" data-max="460" data-url="https://www.sdmy.edu.cn/"><div class="school-name">山东畜牧兽医职业学院</div><div class="score-range">352-460</div><div class="city-tag">潍坊·奎文区胜利东街88号</div></div>
+</div>
+
+<!-- 特色院校 原有内容100%保留，新增官网跳转 -->
+<div class="class-title">特色院校</div>
+<div class="school-grid">
+<div class="school-card" style="--i:1" data-city="济南" data-min="480" data-max="510" data-url="https://www.sepc.edu.cn/"><div class="school-name">山东电力高等专科学校</div><div class="score-range">480-510</div><div class="city-tag">济南·市中区二环南路500号</div></div>
+<div class="school-card" style="--i:2" data-city="济南" data-min="420" data-max="530" data-url="https://www.sdsfjy.cn/"><div class="school-name">山东司法警官职业学院</div><div class="score-range">420-530</div><div class="city-tag">济南·章丘区章莱大道2500号</div></div>
+<div class="school-card" style="--i:3" data-city="济南" data-min="440" data-max="490" data-url="https://www.sdmc.edu.cn/"><div class="school-name">山东医学高等专科学校</div><div class="score-range">440-490</div><div class="city-tag">济南·槐荫区二环西路5466号</div></div>
+<div class="school-card" style="--i:4" data-city="济南" data-min="450" data-max="480" data-url="https://www.stcmchina.com/"><div class="school-name">山东中医药高等专科学校</div><div class="score-range">450-480</div><div class="city-tag">济南·历城区港兴路3366号</div></div>
+<div class="school-card" style="--i:5" data-city="菏泽" data-min="410" data-max="460" data-url="https://www.hzmc.edu.cn/"><div class="school-name">菏泽医学专科学校</div><div class="score-range">410-460</div><div class="city-tag">菏泽·牡丹区大学路1950号</div></div>
+<div class="school-card" style="--i:6" data-city="济南" data-min="380" data-max="460" data-url="https://www.jnnhvc.cn/"><div class="school-name">济南护理职业学院</div><div class="score-range">380-460</div><div class="city-tag">济南·历城区港西路3636号</div></div>
+<div class="school-card" style="--i:7" data-city="潍坊" data-min="340" data-max="460" data-url="https://www.wfhlxy.com/"><div class="school-name">潍坊护理职业学院</div><div class="score-range">340-460</div><div class="city-tag">潍坊·青州市云门山南路9966号</div></div>
+<div class="school-card" style="--i:8" data-city="烟台" data-min="340" data-max="400" data-url="https://www.ytwszy.com/"><div class="school-name">烟台卫生健康职业学院</div><div class="score-range">340-400</div><div class="city-tag">烟台·莱山区滨海东路500号</div></div>
+<div class="school-card" style="--i:9" data-city="济南" data-min="380" data-max="470" data-url="https://www.sdcmc.net/"><div class="school-name">山东传媒职业学院</div><div class="score-range">380-470</div><div class="city-tag">济南·章丘区经十东路8678号</div></div>
+<div class="school-card" style="--i:10" data-city="济南" data-min="380" data-max="460" data-url="https://www.sdcet.cn/"><div class="school-name">山东电子职业技术学院</div><div class="score-range">380-460</div><div class="city-tag">济南·章丘区文化路888号</div></div>
+<div class="school-card" style="--i:11" data-city="济南" data-min="330" data-max="450" data-url="https://www.sdcit.cn/"><div class="school-name">山东信息职业技术学院</div><div class="score-range">330-450</div><div class="city-tag">济南·历下区解放路79号</div></div>
+<div class="school-card" style="--i:12" data-city="济南" data-min="340" data-max="460" data-url="https://www.sdlvtc.cn/"><div class="school-name">山东劳动职业技术学院</div><div class="score-range">340-460</div><div class="city-tag">济南·槐荫区经十路23266号</div></div>
+<div class="school-card" style="--i:13" data-city="青岛" data-min="380" data-max="470" data-url="https://www.qdec.edu.cn/"><div class="school-name">青岛工程职业学院</div><div class="score-range">380-470</div><div class="city-tag">青岛·城阳区上马街道龙翔路中段</div></div>
+<div class="school-card" style="--i:14" data-city="济南" data-min="360" data-max="460" data-url="https://www.jngcxy.edu.cn/"><div class="school-name">济南工程职业技术学院</div><div class="score-range">360-460</div><div class="city-tag">济南·章丘区经十东路6088号</div></div>
+<div class="school-card" style="--i:15" data-city="烟台" data-min="330" data-max="420" data-url="https://www.ytetc.edu.cn/"><div class="school-name">烟台工程职业技术学院</div><div class="score-range">330-420</div><div class="city-tag">烟台·福山区珠江路92号</div></div>
+<div class="school-card" style="--i:16" data-city="青岛" data-min="380" data-max="470" data-url="https://www.sdwm.edu.cn/"><div class="school-name">山东外贸职业学院</div><div class="score-range">380-470</div><div class="city-tag">青岛·李沧区中崂路967号</div></div>
+<div class="school-card" style="--i:17" data-city="潍坊" data-min="340" data-max="450" data-url="https://www.sdjm.edu.cn/"><div class="school-name">山东经贸职业学院</div><div class="score-range">340-450</div><div class="city-tag">潍坊·潍城区青年路2798号</div></div>
+<div class="school-card" style="--i:18" data-city="威海" data-min="360" data-max="430" data-url="https://www.sdspc.edu.cn/"><div class="school-name">山东药品食品职业学院</div><div class="score-range">360-430</div><div class="city-tag">威海·环翠区和兴路1号</div></div>
+<div class="school-card" style="--i:19" data-city="淄博" data-min="330" data-max="470" data-url="https://www.zbsf.edu.cn/"><div class="school-name">淄博师范高等专科学校</div><div class="score-range">330-470</div><div class="city-tag">淄博·淄川区唐骏欧铃路99号</div></div>
+<div class="school-card" style="--i:20" data-city="济南" data-min="330" data-max="460" data-url="https://www.jnpec.edu.cn/"><div class="school-name">济南幼儿师范高等专科学校</div><div class="score-range">330-460</div><div class="city-tag">济南·长清区大学科技园丹桂路2011号</div></div>
+<div class="school-card" style="--i:21" data-city="青岛" data-min="414" data-max="457" data-url="https://www.qmc.edu.cn/"><div class="school-name">青岛远洋船员职业学院</div><div class="score-range">414-457</div><div class="city-tag">青岛·市南区江西路84号</div></div>
+<div class="school-card" style="--i:22" data-city="烟台" data-min="312" data-max="366" data-url="https://www.ytys.edu.cn/"><div class="school-name">烟台幼儿师范高等专科学校</div><div class="score-range">312-366</div><div class="city-tag">烟台·蓬莱区小泰山西路55号</div></div>
+<div class="school-card" style="--i:23" data-city="青岛" data-min="396" data-max="457" data-url="https://www.qdpec.edu.cn/"><div class="school-name">青岛幼儿师范高等专科学校</div><div class="score-range">396-457</div><div class="city-tag">青岛·黄岛区胶州湾东路2566号</div></div>
+<div class="school-card" style="--i:24" data-city="潍坊" data-min="352" data-max="435" data-url="https://www.sdwrp.edu.cn/"><div class="school-name">山东水利职业学院</div><div class="score-range">352-435</div><div class="city-tag">潍坊·奎文区东风东街243号</div></div>
+<div class="school-card" style="--i:25" data-city="烟台" data-min="315" data-max="381" data-url="https://www.sdcs.edu.cn/"><div class="school-name">山东城市服务职业学院</div><div class="score-range">315-381</div><div class="city-tag">烟台·莱山区滨海东路2026号</div></div>
+<div class="school-card" style="--i:26" data-city="济南" data-min="323" data-max="433" data-url="https://www.sdcjxy.edu.cn/"><div class="school-name">山东城市建设职业学院</div><div class="score-range">323-433</div><div class="city-tag">济南·历城区旅游路4657号</div></div>
+<div class="school-card" style="--i:27" data-city="泰安" data-min="339" data-max="410" data-url="https://www.tsnhzyxy.cn/"><div class="school-name">泰山护理职业学院</div><div class="score-range">339-410</div><div class="city-tag">泰安·岱岳区天平大街25号</div></div>
+<div class="school-card" style="--i:28" data-city="济南" data-min="328" data-max="420" data-url="https://www.sdts.net.cn/"><div class="school-name">山东旅游职业学院</div><div class="score-range">328-420</div><div class="city-tag">济南·章丘区经十东路3556号</div></div>
+<div class="school-card" style="--i:29" data-city="烟台" data-min="333" data-max="440" data-url="https://www.sdbi.edu.cn/"><div class="school-name">山东商务职业学院</div><div class="score-range">333-440</div><div class="city-tag">烟台·莱山区海兴路1001号</div></div>
+<div class="school-card" style="--i:30" data-city="济南" data-min="307" data-max="433" data-url="https://www.sdse.cn/"><div class="school-name">山东特殊教育职业学院</div><div class="score-range">307-433</div><div class="city-tag">济南·市中区南辛庄西路326号</div></div>
+</div>
+
+<!-- 公办专科院校 原有内容100%保留，新增官网跳转 -->
+<div class="class-title">公办专科院校</div>
+<div class="school-grid">
+<div class="school-card" style="--i:1" data-city="菏泽" data-min="320" data-max="440" data-url="https://www.hzjzxy.com/"><div class="school-name">菏泽家政职业学院</div><div class="score-range">320-440</div><div class="city-tag">菏泽·单县开发区学院中路</div></div>
+<div class="school-card" style="--i:2" data-city="临沂" data-min="330" data-max="450" data-url="https://www.lyzy.edu.cn/"><div class="school-name">临沂职业学院</div><div class="score-range">330-450</div><div class="city-tag">临沂·罗庄区湖东路63号</div></div>
+<div class="school-card" style="--i:3" data-city="泰安" data-min="320" data-max="400" data-url="https://www.sdfzxy.com/"><div class="school-name">山东服装职业学院</div><div class="score-range">320-400</div><div class="city-tag">泰安·泰山区天烛峰路299号</div></div>
+<div class="school-card" style="--i:4" data-city="烟台" data-min="320" data-max="390" data-url="https://www.ycvc.edu.cn/"><div class="school-name">烟台文化旅游职业学院</div><div class="score-range">320-390</div><div class="city-tag">烟台·莱山区火炬大道3966号</div></div>
+<div class="school-card" style="--i:5" data-city="济南" data-min="316" data-max="407" data-url="https://www.sdca.edu.cn/"><div class="school-name">山东文化艺术职业学院</div><div class="score-range">316-407</div><div class="city-tag">济南·历下区文化东路57号</div></div>
+<div class="school-card" style="--i:6" data-city="威海" data-min="333" data-max="419" data-url="https://www.whovc.edu.cn/"><div class="school-name">威海海洋职业学院</div><div class="score-range">333-419</div><div class="city-tag">威海·荣成市海湾南路1000号</div></div>
+<div class="school-card" style="--i:7" data-city="临沂" data-min="335" data-max="435" data-url="https://www.lykjsxy.edu.cn/"><div class="school-name">临沂科技职业学院</div><div class="score-range">335-435</div><div class="city-tag">临沂·河东区澳门路1号</div></div>
+<div class="school-card" style="--i:8" data-city="枣庄" data-min="319" data-max="460" data-url="https://www.sdzzzy.com/"><div class="school-name">枣庄职业学院</div><div class="score-range">319-460</div><div class="city-tag">枣庄·台儿庄区台南路1号</div></div>
+<div class="school-card" style="--i:9" data-city="淄博" data-min="315" data-max="423" data-url="https://www.sdivc.edu.cn/"><div class="school-name">山东工业职业学院</div><div class="score-range">315-423</div><div class="city-tag">淄博·张店区高新区张北路69号</div></div>
+<div class="school-card" style="--i:10" data-city="济宁" data-min="317" data-max="421" data-url="https://www.sdlgzy.com/"><div class="school-name">山东理工职业学院</div><div class="score-range">317-421</div><div class="city-tag">济宁·任城区荷花路16号</div></div>
+<div class="school-card" style="--i:11" data-city="枣庄" data-min="312" data-max="437" data-url="https://www.zzkjxy.com/"><div class="school-name">枣庄科技职业学院</div><div class="score-range">312-437</div><div class="city-tag">枣庄·滕州市学院东路888号</div></div>
+<div class="school-card" style="--i:12" data-city="淄博" data-min="319" data-max="410" data-url="https://www.shandonghuagong.com/"><div class="school-name">山东化工职业学院</div><div class="score-range">319-410</div><div class="city-tag">淄博·临淄区桓公路11号</div></div>
+<div class="school-card" style="--i:13" data-city="东营" data-min="327" data-max="396" data-url="https://www.sdslxy.cn/"><div class="school-name">山东胜利职业学院</div><div class="score-range">327-396</div><div class="city-tag">东营·东营区济南路1号</div></div>
+<div class="school-card" style="--i:14" data-city="东营" data-min="319" data-max="399" data-url="https://www.dykjxy.com/"><div class="school-name">东营科技职业学院</div><div class="score-range">319-399</div><div class="city-tag">东营·广饶县迎宾路361号</div></div>
+<div class="school-card" style="--i:15" data-city="菏泽" data-min="309" data-max="395" data-url="https://www.hezevocational.edu.cn/"><div class="school-name">菏泽职业学院</div><div class="score-range">309-395</div><div class="city-tag">菏泽·牡丹区长城路999号</div></div>
+<div class="school-card" style="--i:16" data-city="聊城" data-min="318" data-max="421" data-url="https://www.lcvtc.edu.cn/"><div class="school-name">聊城职业技术学院</div><div class="score-range">318-421</div><div class="city-tag">聊城·东昌府区花园北路133号</div></div>
+<div class="school-card" style="--i:17" data-city="淄博" data-min="321" data-max="396" data-url="https://www.sdlgzyxy.cn/"><div class="school-name">山东轻工职业学院</div><div class="score-range">321-396</div><div class="city-tag">淄博·周村区米山路30号</div></div>
+<div class="school-card" style="--i:18" data-city="烟台" data-min="315" data-max="386" data-url="https://www.ytqcvc.cn/"><div class="school-name">烟台汽车工程职业学院</div><div class="score-range">315-386</div><div class="city-tag">烟台·福山区聚贤路1号</div></div>
+<div class="school-card" style="--i:19" data-city="德州" data-min="321" data-max="407" data-url="https://www.dzvtc.edu.cn/"><div class="school-name">德州职业技术学院</div><div class="score-range">321-407</div><div class="city-tag">德州·德城区大学东路689号</div></div>
+<div class="school-card" style="--i:20" data-city="聊城" data-min="337" data-max="367" data-url="https://www.lckjzy.cn/"><div class="school-name">聊城科技职业学院</div><div class="score-range">337-367</div><div class="city-tag">聊城·东昌府区站前街8号</div></div>
+<div class="school-card" style="--i:21" data-city="淄博" data-min="291" data-max="413" data-url="https://www.slvcn.com/"><div class="school-name">山东铝业职业学院</div><div class="score-range">291-413</div><div class="city-tag">淄博·张店区南定镇山铝花园路8号</div></div>
+<div class="school-card" style="--i:22" data-city="泰安" data-min="319" data-max="415" data-url="https://www.mtvc.cn/"><div class="school-name">泰山职业技术学院</div><div class="score-range">319-415</div><div class="city-tag">泰安·泰山区天烛峰路281号</div></div>
+<div class="school-card" style="--i:23" data-city="德州" data-min="0" data-max="999" data-url="https://www.dzznjsxy.cn/"><div class="school-name">德州智能技术职业学院</div><div class="score-range">暂无分数线</div><div class="city-tag">德州·德城区崇德一大道</div></div>
+<div class="school-card" style="--i:24" data-city="青岛" data-min="0" data-max="999" data-url="https://www.qdjkzyxy.cn/"><div class="school-name">青岛健康科技职业学院</div><div class="score-range">暂无分数线</div><div class="city-tag">青岛·城阳区艳阳路99号</div></div>
+<div class="school-card" style="--i:25" data-city="济宁" data-min="0" data-max="999" data-url="https://www.jnwsjkzyxy.cn/"><div class="school-name">济宁卫生健康职业学院</div><div class="score-range">暂无分数线</div><div class="city-tag">济宁·任城区荷花路</div></div>
+</div>
+
+<!-- 民办本科院校 原有内容100%保留，新增官网跳转 -->
+<div class="class-title">民办本科院校（含专科）</div>
+<div class="school-grid">
+<div class="school-card" style="--i:1" data-city="青岛" data-min="300" data-max="450" data-url="https://www.qdbhu.edu.cn/"><div class="school-name">青岛滨海学院</div><div class="score-range">300-450</div><div class="city-tag">青岛·黄岛区嘉陵江西路425号</div></div>
+<div class="school-card" style="--i:2" data-city="烟台" data-min="290" data-max="440" data-url="https://www.nanshan.edu.cn/"><div class="school-name">烟台南山学院</div><div class="score-range">290-440</div><div class="city-tag">烟台·龙口市东海旅游度假区</div></div>
+<div class="school-card" style="--i:3" data-city="潍坊" data-min="280" data-max="430" data-url="https://www.wfkjxy.edu.cn/"><div class="school-name">潍坊科技学院</div><div class="score-range">280-430</div><div class="city-tag">潍坊·寿光市金光街1299号</div></div>
+<div class="school-card" style="--i:4" data-city="济南" data-min="295" data-max="445" data-url="https://www.sdxiehe.edu.cn/"><div class="school-name">山东协和学院</div><div class="score-range">295-445</div><div class="city-tag">济南·历城区济青路6277号</div></div>
+<div class="school-card" style="--i:5" data-city="济南" data-min="285" data-max="435" data-url="https://www.sdycxy.com/"><div class="school-name">山东英才学院</div><div class="score-range">285-435</div><div class="city-tag">济南·高新区英才路2号</div></div>
+<div class="school-card" style="--i:6" data-city="青岛" data-min="305" data-max="455" data-url="https://www.qdhhc.edu.cn/"><div class="school-name">青岛黄海学院</div><div class="score-range">305-455</div><div class="city-tag">青岛·黄岛区灵海路1145号</div></div>
+<div class="school-card" style="--i:7" data-city="青岛" data-min="310" data-max="460" data-url="https://www.qdc.edu.cn/"><div class="school-name">青岛城市学院</div><div class="score-range">310-460</div><div class="city-tag">青岛·城阳区铁骑山路79号</div></div>
+<div class="school-card" style="--i:8" data-city="济南" data-min="290" data-max="440" data-url="https://www.sdxd.edu.cn/"><div class="school-name">山东现代学院</div><div class="score-range">290-440</div><div class="city-tag">济南·经十东路20288号</div></div>
+<div class="school-card" style="--i:9" data-city="济南" data-min="280" data-max="430" data-url="https://www.sdetc.edu.cn/"><div class="school-name">山东工程职业技术大学</div><div class="score-range">280-430</div><div class="city-tag">济南·章丘区经十东路6196号</div></div>
+<div class="school-card" style="--i:10" data-city="潍坊" data-min="275" data-max="425" data-url="https://www.sdflc.edu.cn/"><div class="school-name">山东外国语职业技术大学</div><div class="score-range">275-425</div><div class="city-tag">潍坊·潍城区西环路6789号</div></div>
+</div>
+
+<!-- 民办专科院校 原有内容100%保留，新增官网跳转 -->
+<div class="class-title">民办专科院校</div>
+<div class="school-grid">
+<div class="school-card" style="--i:1" data-city="济南" data-min="150" data-max="280" data-url="https://www.sdsh.edu.cn/"><div class="school-name">山东圣翰财贸职业学院</div><div class="score-range">150-280</div><div class="city-tag">济南·长清区大学路1600号</div></div>
+<div class="school-card" style="--i:2" data-city="济南" data-min="150" data-max="275" data-url="https://www.6789.com.cn/"><div class="school-name">山东力明科技职业学院</div><div class="score-range">150-275</div><div class="city-tag">济南·市中区济微路389号</div></div>
+<div class="school-card" style="--i:3" data-city="青岛" data-min="150" data-max="285" data-url="https://www.feiyangcollege.com/"><div class="school-name">青岛飞洋职业技术学院</div><div class="score-range">150-285</div><div class="city-tag">青岛·城阳区韩海路16号</div></div>
+<div class="school-card" style="--i:4" data-city="青岛" data-min="150" data-max="290" data-url="https://www.qdqs.com/"><div class="school-name">青岛求实职业技术学院</div><div class="score-range">150-290</div><div class="city-tag">青岛·即墨区蓝村镇南泉祥吉路18号</div></div>
+<div class="school-card" style="--i:5" data-city="烟台" data-min="150" data-max="270" data-url="https://www.ytgold.cn/"><div class="school-name">烟台黄金职业学院</div><div class="score-range">150-270</div><div class="city-tag">烟台·招远市滨海新区</div></div>
+<div class="school-card" style="--i:6" data-city="潍坊" data-min="150" data-max="275" data-url="https://www.wfgsxy.com/"><div class="school-name">潍坊工商职业学院</div><div class="score-range">150-275</div><div class="city-tag">潍坊·诸城市凤凰路5600号</div></div>
+<div class="school-card" style="--i:7" data-city="德州" data-min="150" data-max="265" data-url="https://www.dzkjxy.com/"><div class="school-name">德州科技职业学院</div><div class="score-range">150-265</div><div class="city-tag">德州·禹城市学院街566号</div></div>
+<div class="school-card" style="--i:8" data-city="滨州" data-min="150" data-max="270" data-url="https://www.bzkjzyxy.cn/"><div class="school-name">滨州科技职业学院</div><div class="score-range">150-270</div><div class="city-tag">滨州·滨城区渤海五路755号</div></div>
+<div class="school-card" style="--i:9" data-city="枣庄" data-min="150" data-max="260" data-url="https://www.zzlgxy.com/"><div class="school-name">枣庄理工职业学院</div><div class="score-range">150-260</div><div class="city-tag">枣庄·薛城区祁连山路3666号</div></div>
+<div class="school-card" style="--i:10" data-city="临沂" data-min="150" data-max="265" data-url="https://www.lykjsxy.edu.cn/"><div class="school-name">临沂科技职业学院</div><div class="score-range">150-265</div><div class="city-tag">临沂·河东区澳门路1号</div></div>
+</div>
+
+<script>
+// 筛选功能优化，新增动态动画
+function filterSchool(){
+    let userScore = document.getElementById('scoreInput').value.trim();
+    let selectCity = document.getElementById('areaSelect').value;
+    let allCards = document.querySelectorAll('.school-card');
+    allCards.forEach(card=>{
+        let cardCity = card.dataset.city;
+        let minScore = Number(card.dataset.min);
+        let maxScore = Number(card.dataset.max);
+        let show = true;
+        if(selectCity && cardCity !== selectCity) show = false;
+        if(userScore && !(userScore >= minScore && userScore <= maxScore)) show = false;
+        // 动态显示隐藏，带动画
+        if(show){
+            card.classList.remove('hide');
+            card.classList.add('show');
+        }else{
+            card.classList.remove('show');
+            card.classList.add('hide');
+        }
+    })
+}
+
+// 点击学校卡片跳转到官网
+document.addEventListener('DOMContentLoaded',()=>{
+    let allCards = document.querySelectorAll('.school-card');
+    allCards.forEach(card=>{
+        card.addEventListener('click',()=>{
+            let url = card.dataset.url;
+            if(url) window.open(url,'_blank');
+        })
+    })
+})
+</script>
+</body>
+</html>
